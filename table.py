@@ -13,20 +13,27 @@ class Table:
     def __init__(self, storage:JSONStorage, name:str) -> None:
         self._storage = storage
         self._name = name
-        self._next_id = None
 
     def _read_table(self):
         tables = self._storage.read()
         if tables is None:
             return {}
-        
         try:
             table = tables[self._name]
         except:
             return {}
-        
         return table
 
+    def _get_next_id(self):
+        table = self._read_table()
+
+        if not table:
+            next_id = 1
+            return next_id
+        else:
+            max_id = max(self.document_id_class(i) for i in table.keys())
+            next_id = max_id + 1
+            return next_id
 
 if __name__=="__main__":
     test_storage = JSONStorage("./example.json")
