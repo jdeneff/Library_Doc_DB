@@ -14,6 +14,26 @@ class Table:
         self._storage = storage
         self._name = name
 
+    def insert(self, document:dict):
+        table = self._read_table()
+        doc_id = self._get_next_id()
+        
+        def updater(table:dict):
+            table[doc_id] = document
+        self._update_table(updater)
+        
+
+    def _update_table(self, update_func):
+        tables = self._storage.read()
+        raw_table = tables[self._name]
+
+        table = {self.document_id_class(doc_id): doc for doc_id, doc in raw_table.items()}
+        update_func(table)
+
+        tables[self._name] = {str(doc_id):doc for doc_id, doc in table.items()}
+        self._storage.write(tables)
+
+
     def _read_table(self):
         tables = self._storage.read()
         if tables is None:
@@ -40,3 +60,4 @@ if __name__=="__main__":
     table1 = Table(test_storage, "table1")
 
     print(table1._read_table())
+    print(table1._get_next_id())
