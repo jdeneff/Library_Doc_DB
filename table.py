@@ -25,7 +25,13 @@ class Table:
 
     def _update_table(self, update_func):
         tables = self._storage.read()
-        raw_table = tables[self._name]
+        if tables is None:
+            tables = {}
+
+        try:
+            raw_table = tables[self._name]
+        except KeyError:
+            raw_table = {}
 
         table = {self.document_id_class(doc_id): doc for doc_id, doc in raw_table.items()}
         update_func(table)
@@ -56,8 +62,15 @@ class Table:
             return next_id
 
 if __name__=="__main__":
-    test_storage = JSONStorage("./example.json")
+    test_storage = JSONStorage("./blank.json")
     table1 = Table(test_storage, "table1")
 
     print(table1._read_table())
     print(table1._get_next_id())
+
+    table1.insert({
+            "doc": 2,
+            "value": "blue"
+        })
+    
+    print(table1._read_table())

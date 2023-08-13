@@ -1,5 +1,5 @@
 {
-    "table1":{
+    "table1": {
         "0": {
             "doc": 0,
             "value": true
@@ -7,6 +7,10 @@
         "1": {
             "doc": 1,
             "value": false
+        },
+        "2": {
+            "doc": 2,
+            "value": "blue"
         }
     }
 }

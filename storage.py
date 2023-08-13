@@ -7,8 +7,8 @@ def touch(path:str):
     Create a file if it does not exist yet
     """
     if not os.path.exists(path):
-        with open(path, "a"):
-            pass
+        with open(path, "a") as f:
+            f.write("{}")
 
 
 class JSONStorage:
