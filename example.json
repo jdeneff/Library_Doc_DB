@@ -1,0 +1,10 @@
+{
+    "0": {
+        "doc": 0,
+        "value": true
+    },
+    "1": {
+        "doc": 1,
+        "value": false
+    }
+}
