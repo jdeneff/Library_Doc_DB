@@ -38,7 +38,7 @@ class JSONStorage:
 
 
 if __name__=="__main__":
-    test_stor = JSONStorage("./blank.json")
+    test_stor = JSONStorage("C:/Users/Admin/Jacob_Docs/Python_Projects/test.json")
     print(test_stor.read())
 
     example = {
