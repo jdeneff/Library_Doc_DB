@@ -21,6 +21,9 @@ class Table:
         def updater(table:dict):
             table[doc_id] = document
         self._update_table(updater)
+    
+    def update(self, doc_id, data):
+        table = self._read_table()
         
 
     def _update_table(self, update_func):
