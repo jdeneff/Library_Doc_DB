@@ -1,59 +1,43 @@
 import os
 import json
 
-# test change
-def touch_json(path:str):
-    """
-    Create a file if it does not exist yet
-    """
-    if not os.path.exists(path):
-        with open(path, "a") as f:
-            f.write("{}")
-
-
 class JSONStorage:
-    def __init__(self, path:str):
-        # Open for read/write, create file if it doesn't exist, 
-        touch_json(path)
-        self._handle = open(path, "r+")
+    def __init__(self):
+        pass
 
-    def read(self):
+    def coll_create(self, path:str):
+        """
+        Create a collection json file if it does not exist yet
+        """
+        if not os.path.exists(path):
+            with open(path, "a") as f:
+                f.write("{}")
+        else:
+            print(f"Error writing file to {path}")
+    
+    def coll_delete(self, path:str):
+        if os.path.exists(path):
+            os.remove(path)
+        else:
+            print("Collection not found")
+
+    def read(self, path:str):
         # Read in from start of file, error if file is blank or not json formatted
-        self._handle.seek(0)
-        return json.load(self._handle)
+        if os.path.exists(path):
+            with open(path, "r+") as f:
+                data = json.load(f)
+            return data
+        else:
+            print("File not found")
 
-    def write(self, data:dict):
-        # Write from start of file using json formatter
-        self._handle.seek(0)
+    def write(self, path:str, data:dict):
         serialized = json.dumps(data, indent=4)
-        self._handle.write(serialized)
-        # Flush file buffer, then force write to ensure write worked without closing
-        self._handle.flush()
-        os.fsync(self._handle.fileno())
-        # Truncate in case file got shorter
-        self._handle.truncate()
-
-    def close(self):
-        self._handle.close()
+        if os.path.exists(path):
+            with open(path, "r+") as f:
+                f.seek(0)
+                f.write(serialized)
+                f.truncate()
 
 
 if __name__=="__main__":
-    test_stor = JSONStorage("C:/Users/Admin/Jacob_Docs/Python_Projects/test.json")
-    print(test_stor.read())
-
-    example = {
-        "0":{
-            "doc":0,
-            "value": True
-        },
-        "1":{
-            "doc":1,
-            "value": False
-        }
-    }
-
-    test_stor.write(example)
-
-    print(test_stor.read())
-
-    test_stor.close()
+    pass
