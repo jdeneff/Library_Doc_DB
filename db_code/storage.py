@@ -5,6 +5,27 @@ class JSONStorage:
     def __init__(self):
         pass
 
+    def db_create(self, name:str, path:str):
+        """
+        Create an index file for a database if it does not exist yet
+        """
+        if not os.path.exists(path):
+            base = {
+                "name":name,
+                "collections":{}
+            }
+            ser_base = json.dumps(base)
+            with open(path, "a") as f:
+                f.write(ser_base)
+        else:
+            print(f"Error writing file to {path}")
+
+    def db_delete(self, path:str):
+        if os.path.exists(path):
+            os.remove(path)
+        else:
+            print("Database not found")
+
     def coll_create(self, path:str):
         """
         Create a collection json file if it does not exist yet
@@ -40,4 +61,5 @@ class JSONStorage:
 
 
 if __name__=="__main__":
-    pass
+    tstor = JSONStorage()
+    tstor.db_delete("./index.json")
