@@ -12,7 +12,7 @@ class JSONStorage:
         if not os.path.exists(path):
             base = {
                 "name":name,
-                "collections":{}
+                "index":{}
             }
             ser_base = json.dumps(base)
             with open(path, "a") as f:
