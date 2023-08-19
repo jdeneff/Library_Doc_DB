@@ -1,32 +1,50 @@
+import os
 from storage import JSONStorage
 
 class DocDB:
     def __init__(self) -> None:
         self._storage = JSONStorage()
         self._name = None
-        self._dir_path = None
+
+        self._file_name = None
+        self._dir_name = None
+
         self._next_id = None
-        self._index = {}
+        self._collections = {}
     
-    def create(self, name:str, dir_path:str):
-        # Need to make it error when the file already exists - use return from storage
-        self._name = name
-        self._dir_path = dir_path
-        file_path = self._dir_path + "/" + self._name + "_index.json"
-        self._storage.db_create(self._name, file_path)
+    def create(self, name:str, dir_name:str):
+        """Create a new database json file using the base format"""
+        base = {
+            "name":name,
+            "collections":{},
+            "indices":{}
+        }
+
+        file_name = name + "_db.json"
+        if not self._storage.exists(dir_name, file_name):
+            self._name = name
+            self._dir_name = dir_name
+            self._file_name = file_name
+            self._storage.jsonfile_create(base, self._dir_name, self._file_name)
+        else:
+            print("File already exists with that name")
     
     def open(self, path:str):
-        # Need to make it error when the file is not found - use return from storage
-        data = self._storage.read(path)
-        self._name = data["name"]
-        self._index = data["index"]
-        self._dir_path = path[0:path.rfind("/")+1]
+        dir_name, file_name = os.path.split(path)
+        if self._storage.exists(dir_name, file_name):
+            data = self._storage.read(dir_name, file_name)
+            if data is not None:
+                self._name = data["name"]
+                self._collections = data["collections"]
+                self._dir_name = dir_name
+                self._file_name = file_name
+            else:
+                print("Something went wrong loading the data")
+        else:
+            print("File does not exist")
     
 if __name__ == "__main__":
     db = DocDB()
-    db.create("test", "C:/Users/Admin/Jacob_Docs")
-    db_two = DocDB()
-    db_two.open("C:/Users/Admin/Jacob_Docs/test_index.json")
-    print(db_two._name)
-    print(db_two._index)
-    print(db_two._dir_path)
+    db.create("test", "./")
+    db2 = DocDB()
+    db2.open("./test_db.json")
