@@ -5,56 +5,46 @@ class JSONStorage:
     def __init__(self):
         pass
 
-    def db_create(self, name:str, path:str):
-        """
-        Create an index file for a database if it does not exist yet
-        """
-        if not os.path.exists(path):
-            base = {
-                "name":name,
-                "index":{}
-            }
-            ser_base = json.dumps(base)
-            with open(path, "a") as f:
-                f.write(ser_base)
+    def exists(self, dir_name:str, file_name:str):
+        """Check if a file exists based on directory and file name"""
+        file_path = os.path.join(dir_name, file_name)
+        if os.path.exists(file_path):
+            return True
         else:
-            print(f"Error writing file to {path}")
+            return False
 
-    def db_delete(self, path:str):
-        if os.path.exists(path):
-            os.remove(path)
+    def jsonfile_create(self, data:dict, dir_name:str, file_name:str):
+        """Create a json file with some data if it does not exist already"""
+        ser_data = json.dumps(data)
+        file_path = os.path.join(dir_name, file_name)
+        if not os.path.exists(file_path):
+            with open(file_path, "a") as f:
+                f.write(ser_data)
+            return True
         else:
-            print("Database not found")
+            print(f"Error writing file to {file_path}")
+            return False
 
-    def coll_create(self, path:str):
-        """
-        Create a collection json file if it does not exist yet
-        """
-        if not os.path.exists(path):
-            with open(path, "a") as f:
-                f.write("{}")
-        else:
-            print(f"Error writing file to {path}")
-    
-    def coll_delete(self, path:str):
-        if os.path.exists(path):
-            os.remove(path)
-        else:
-            print("Collection not found")
-
-    def read(self, path:str):
-        # Read in from start of file, error if file is blank or not json formatted
-        if os.path.exists(path):
-            with open(path, "r+") as f:
-                data = json.load(f)
+    def read(self, dir_name:str, file_name:str):
+        """Read from a json file and return an error if it does not exist or isn't json formatted"""
+        file_path = os.path.join(dir_name, file_name)
+        if os.path.exists(file_path):
+            with open(file_path, "r+") as f:
+                try:
+                    data = json.load(f)
+                except:
+                    print("Not json formatted")
+                    return
             return data
         else:
             print("File not found")
 
-    def write(self, path:str, data:dict):
+    def write(self, data:dict, dir_name:str, file_name:str):
+        """Overwrite an existing json file then truncate to new length, if shorter than before"""
         serialized = json.dumps(data, indent=4)
-        if os.path.exists(path):
-            with open(path, "r+") as f:
+        file_path = os.path.join(dir_name, file_name)
+        if os.path.exists(file_path):
+            with open(file_path, "r+") as f:
                 f.seek(0)
                 f.write(serialized)
                 f.truncate()
@@ -62,4 +52,5 @@ class JSONStorage:
 
 if __name__=="__main__":
     tstor = JSONStorage()
-    tstor.db_delete("./index.json")
+    tryto = tstor.jsonfile_create({},"./", "test.json")
+    print(tryto)
