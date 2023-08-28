@@ -1,50 +1,52 @@
 import os
 from storage import JSONStorage
+from collection import Collection
 
 class DocDB:
-    def __init__(self) -> None:
+    def __init__(self, file_path:str):
         self._storage = JSONStorage()
-        self._name = None
+        self._file_path = file_path
+        self._coll_paths = {}   # Collection paths from file
+        self._collections = {}  # Collection objects
 
-        self._file_name = None
-        self._dir_name = None
-
-        self._next_id = None
-        self._collections = {}
-    
-    def create(self, name:str, dir_name:str):
-        """Create a new database json file using the base format"""
-        base = {
-            "name":name,
-            "collections":{},
-            "indices":{}
-        }
-
-        file_name = name + "_db.json"
-        if not self._storage.exists(dir_name, file_name):
-            self._name = name
-            self._dir_name = dir_name
-            self._file_name = file_name
-            self._storage.jsonfile_create(base, self._dir_name, self._file_name)
+        # If the database file does not exist, create it
+        if not self._storage.exists(file_path):
+            self._storage.jsonfile_create(
+                {
+                "collections":{}
+                },
+                self._file_path
+            )
+        # If the database file does exist, read it and create the collection objects for it
         else:
-            print("File already exists with that name")
+            data = self._storage.read(self._file_path)
+            self._coll_paths:dict = data["collections"]
+            for coll_id, coll_path in self._coll_paths.items():
+                collection = Collection(coll_path, self._storage)
+                self._collections[str(coll_id)] = collection
     
-    def open(self, path:str):
-        dir_name, file_name = os.path.split(path)
-        if self._storage.exists(dir_name, file_name):
-            data = self._storage.read(dir_name, file_name)
-            if data is not None:
-                self._name = data["name"]
-                self._collections = data["collections"]
-                self._dir_name = dir_name
-                self._file_name = file_name
+    def add_collection(self, coll_name):
+        if coll_name not in self._coll_paths.keys():
+            dir_path = os.path.dirname(self._file_path)
+            coll_path = os.path.join(dir_path, f"{coll_name}.json")
+            if not self._storage.exists(coll_path):
+                self._storage.jsonfile_create({}, coll_path)
+                self._coll_paths[coll_name] = coll_path
+                self._collections[coll_name] = Collection(coll_path, self._storage)
             else:
-                print("Something went wrong loading the data")
+                print("File already exists")
         else:
-            print("File does not exist")
-    
+            print("Collection already exists")
+
+    def read_collections(self):
+        pass
+
+    def drop_collection(self):
+        pass
+
+    def drop_all_collections(self):
+        pass
+
+
 if __name__ == "__main__":
-    db = DocDB()
-    db.create("test", "./")
-    db2 = DocDB()
-    db2.open("./test_db.json")
+    pass
