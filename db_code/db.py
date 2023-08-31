@@ -6,12 +6,12 @@ class DocDB:
     def __init__(self, file_path:str):
         self._storage = JSONStorage()
         self._file_path = file_path
-        self._coll_paths = {}   # Collection paths from file
-        self._collections = {}  # Collection objects
 
         # If the database file does not exist, create it
         if not self._storage.exists(file_path):
             self._storage.jsonfile_create({}, self._file_path)
+            self._coll_paths = {}   # Collection paths from file
+            self._collections = {}  # Collection objects
 
         # If the database file does exist, read it and create the collection objects for it
         else:
@@ -60,11 +60,4 @@ class DocDB:
 
 
 if __name__ == "__main__":
-    db = DocDB("test_new_db/test_db.json")
-    # db.add_collection("one")
-    # db.add_collection("two")
-    print(db._coll_paths)
-    print(db._collections)
-    db.drop_collection("one")
-    print(db._coll_paths)
-    print(db._collections)
+    pass
