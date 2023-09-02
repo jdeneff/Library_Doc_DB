@@ -1,8 +1,0 @@
-{
-    "name":"test",
-    "collections":{
-        "one":"C:/Users/Admin/Jacob_Docs/Python_Projects/Library_Doc_DB/db_testing/one_coll.json",
-        "two":"C:/Users/Admin/Jacob_Docs/Python_Projects/Library_Doc_DB/db_testing/two_coll.json"
-    },
-    "indices":{}
-}
