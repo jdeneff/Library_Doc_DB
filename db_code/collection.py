@@ -53,7 +53,7 @@ class Collection:
         self.storage.write(self.docs, self.file_path)
         
     
-    def get(self, doc_id:int):
+    def get_doc(self, doc_id:int):
         """Get a single document based on its document id"""
         # First deal with given ID, if any
         if doc_id not in self.docs.keys():
@@ -62,21 +62,17 @@ class Collection:
             return Document(doc_id, self.docs[doc_id])
         
     def get_all(self):
-        """Get a list of all documents"""
+        """Get a list of all document objects in the database"""
         docs = []
         for doc_id, doc in self.docs.items():
             docs.append(Document(doc_id, doc))
         return docs
     
-    def search(self, cond:dict):
-        # Then check for the condition
-        if len(cond) != 1:
-            raise Exception('Function can only handle a single key:value pair')  
+    def search(self, s_key, s_value):
+        """Get a list of all documents matching a given key-value pair"""  
         docs = []
-        s_key, s_value = cond.popitem()
-        print(s_key)
-        print(s_value)
         for doc_id, doc in self.docs.items():
+            # Check if the doc has s_key, and if s_key if paired with s_value
             if doc.get(s_key, None) == s_value:
                 docs.append(Document(doc_id, doc))
         return docs
