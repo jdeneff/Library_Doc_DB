@@ -174,10 +174,12 @@ class Collection:
 
     def delete(self, doc_id):
         """Delete a single dictionary document based on its document id"""
-        # Generic updater function to be called by the collection update function
-        def updater(coll:dict):
-            coll.pop(doc_id)
-        self._update_collection(updater)
+        if doc_id not in self.docs.keys():
+            print(f'Document with ID {str(doc_id)} is not found')
+            return 0
+        self.docs.pop(doc_id)
+        self.storage.write(self.docs, self.file_path)
+        return 1
 
     def _get_next_id(self):
         """Get the next document id for indexing"""
