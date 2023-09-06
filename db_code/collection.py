@@ -181,29 +181,6 @@ class Collection:
         self.storage.write(self.docs, self.file_path)
         return 1
 
-    def _get_next_id(self):
-        """Get the next document id for indexing"""
-        # If the internal counter already has a next id, use that and then increment it
-        if self.next_id is not None:
-            next_id = self.next_id
-            self.next_id += 1
-            return next_id
-        # If the file is just opened and is empty, start at 1
-        if self.docs == {}:
-            next_id = 1
-        # If the file is just opened and has docs, find the highest key and use the next one
-        else:
-            max_id = max(int(i) for i in self.docs.keys())
-            next_id = max_id + 1
-        self.next_id = next_id +1
-        return next_id
-    
-    def _update_collection(self, updater):
-        # Update internally held dictionary
-        updater(self.docs)
-        # Serialize internal dictionary as json then write to the collection file
-        self.storage.write(self.docs, self.file_path)
-
 if __name__ == "__main__":
     test_coll = Collection('./test_coll.json')
 
