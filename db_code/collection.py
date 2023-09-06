@@ -56,11 +56,12 @@ class Collection:
             self,
             doc_id:int = None,
             doc_ids:list[int] = None,
-            cond:dict = None):
-        
+            cond:dict = None
+            ):
         """Get a list of all documents matching an id, list of ids, or condition"""
         # Empty initial document list
         doc_list = []
+
         # If one id was provided, return that document in a list
         if doc_id is not None:
             try:
@@ -96,11 +97,23 @@ class Collection:
                 doc_list.append(Document(_doc_id, data))
             return doc_list
 
-    def get_ids(self):
+    def get_ids(self, cond:dict = None):
         """Get a list of all document ids in the collection"""
-        ids = []
-        for key in self.docs.keys(): ids.append(key)
-        return ids
+        id_list = []
+
+        # If a condition was provided, return document ids matching that condition in a list
+        if cond is not None:
+            s_key, s_value = cond.popitem()
+            for doc_id, data in self.docs.items():
+                if data.get(s_key, None) == s_value:
+                    id_list.append(doc_id)
+            return id_list
+        
+        # Otherwise return all document ids in a list
+        else:
+            for doc_id in self.docs.keys(): 
+                id_list.append(doc_id)
+            return id_list
 
     def update(self, newdocs:dict, doc_id:int = None, s_key = None, s_value = None):
         """Update a single dictionary document based on its document id using a dictionary of new or updated key value pairs"""
