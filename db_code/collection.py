@@ -66,7 +66,7 @@ class Collection:
         if doc_id is not None:
             try:
                 data = self.docs[doc_id]
-            except ValueError:
+            except KeyError:
                 print(f'Document with ID {str(doc_id)} is not found')
             else:
                 doc_list.append(Document(doc_id, data))
@@ -115,17 +115,63 @@ class Collection:
                 id_list.append(doc_id)
             return id_list
 
-    def update(self, newdocs:dict, doc_id:int = None, s_key = None, s_value = None):
-        """Update a single dictionary document based on its document id using a dictionary of new or updated key value pairs"""
+    def update(
+            self,
+            changes:dict,
+            doc_id:int = None,
+            doc_ids:list[int] = None,
+            cond:dict = None
+            ):
+        """Update one or more documents based on document ids or a search using a dictionary of new or updated key value pairs"""
+        update_count = 0
+
+        # If an ID is given, check if it exists then update if it does
+        if doc_id is not None:
+            if doc_id not in self.docs.keys():
+                print(f'Document with ID {str(doc_id)} is not found')
+                return 0
+            data = self.docs[doc_id]
+            for key, value in changes.items():
+                data[key] = value
+            self.docs[doc_id] = data
+            update_count += 1
         
+        # If an ID list is given, check that they all exist, then update if they do
+        elif doc_ids is not None:
+            for _doc_id in doc_ids:
+                if _doc_id not in self.docs.keys():
+                    print(f'Document with ID {str(_doc_id)} is not found')
+                    return 0
+            for _doc_id in doc_ids:
+                data = self.docs[_doc_id]
+                for key, value in changes.items():
+                    data[key] = value
+                self.docs[_doc_id] = data
+                update_count += 1
+
+        # If a condition is given, find the IDs that fit it then update those
+        elif cond is not None:
+            _doc_ids = self.get_ids(cond)
+            if len(_doc_ids) == 0:
+                print("No documents found")
+                return 0
+            else:
+                for _doc_id in _doc_ids:
+                    data = self.docs[_doc_id]
+                    for key, value in changes.items():
+                        data[key] = value
+                    self.docs[_doc_id] = data
+                    update_count += 1
         
-        # Generic updater function to be called by the collection update function
-        def updater(coll:dict):
-            doc:dict = coll[doc_id]
-            for key, item in newdocs.items(): doc[key] = item
-            coll[doc_id] = doc
-        self._update_collection(updater)
-    
+        # If nothing was given inform the user then exit
+        else:
+            print("No criteria provided")
+            return 0
+
+        # If none of the conditions returned 0, write the internal dictionary to file then return the number of updated docs
+        self.storage.write(self.docs, self.file_path)
+        return update_count
+
     def delete(self, doc_id):
         """Delete a single dictionary document based on its document id"""
         # Generic updater function to be called by the collection update function
