@@ -51,40 +51,61 @@ class Collection:
         # Update internal dictionary and write to file
         self.docs[doc_id] = doc
         self.storage.write(self.docs, self.file_path)
-        
     
-    def get_doc(self, doc_id:int):
-        """Get a single document based on its document id"""
-        # First deal with given ID, if any
-        if doc_id not in self.docs.keys():
-            raise Exception(f'Document with ID {str(doc_id)} is not found')
+    def get_docs(
+            self,
+            doc_id:int = None,
+            doc_ids:list[int] = None,
+            cond:dict = None):
+        
+        """Get a list of all documents matching an id, list of ids, or condition"""
+        # Empty initial document list
+        doc_list = []
+        # If one id was provided, return that document in a list
+        if doc_id is not None:
+            try:
+                data = self.docs[doc_id]
+            except ValueError:
+                print(f'Document with ID {str(doc_id)} is not found')
+            else:
+                doc_list.append(Document(doc_id, data))
+            return doc_list
+        
+        # If many ids were provided, return all documents for them in a list
+        elif doc_ids is not None:
+            for _doc_id in doc_ids:
+                try:
+                    data = self.docs[_doc_id]
+                except ValueError:
+                    print(f'Document with ID {str(_doc_id)} is not found')
+                else:
+                    doc_list.append(Document(_doc_id, data))
+            return doc_list
+        
+        # If a condition was provided, return documents matching that condition in a list
+        elif cond is not None:
+            s_key, s_value = cond.popitem()
+            for _doc_id, data in self.docs.items():
+                if data.get(s_key, None) == s_value:
+                    doc_list.append(Document(_doc_id, data))
+            return doc_list
+        
+        # Otherwise return all documents in a list
         else:
-            return Document(doc_id, self.docs[doc_id])
-        
-    def get_all(self):
-        """Get a list of all document objects in the database"""
-        docs = []
-        for doc_id, doc in self.docs.items():
-            docs.append(Document(doc_id, doc))
-        return docs
-    
-    def search(self, s_key, s_value):
-        """Get a list of all documents matching a given key-value pair"""  
-        docs = []
-        for doc_id, doc in self.docs.items():
-            # Check if the doc has s_key, and if s_key if paired with s_value
-            if doc.get(s_key, None) == s_value:
-                docs.append(Document(doc_id, doc))
-        return docs
+            for _doc_id, data in self.docs.items():
+                doc_list.append(Document(_doc_id, data))
+            return doc_list
 
     def get_ids(self):
         """Get a list of all document ids in the collection"""
-        docs = []
-        for key in self.docs.keys(): docs.append(key)
-        return docs
+        ids = []
+        for key in self.docs.keys(): ids.append(key)
+        return ids
 
-    def update(self, doc_id:int, newdocs:dict):
+    def update(self, newdocs:dict, doc_id:int = None, s_key = None, s_value = None):
         """Update a single dictionary document based on its document id using a dictionary of new or updated key value pairs"""
+        
+        
         # Generic updater function to be called by the collection update function
         def updater(coll:dict):
             doc:dict = coll[doc_id]
@@ -124,9 +145,21 @@ class Collection:
 
 if __name__ == "__main__":
     test_coll = Collection('./test_coll.json')
-    
-    doc_one = {'one':'one', 'two':2, 'three':'trois'}
-    doc_two = {'testing':'one, two, three'}
 
-    test_query = test_coll.get(5)
-    print(test_query)
+    test_one = test_coll.get_docs(doc_id=1)
+    test_two = test_coll.get_docs(doc_ids=[1,3,4])
+    test_three = test_coll.get_docs(cond={'two':2})
+    test_four = test_coll.get_docs()
+    print("one")
+    for doc in test_one:
+        print(doc)
+
+    print("\ntwo")
+    for doc in test_two:
+        print(doc)
+    print("\nthree")
+    for doc in test_three:
+        print(doc)
+    print("\nfour")
+    for doc in test_four:
+        print(doc)
