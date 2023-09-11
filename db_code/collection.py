@@ -1,5 +1,4 @@
 import json
-import os
 from storage import JSONStorage
 
 class Document(dict):
@@ -35,7 +34,6 @@ class Collection:
             else:
                 max_id = max(int(i) for i in self.docs.keys())
                 self.next_id = max_id + 1
-
     
     def insert(self, doc:dict):
         """Add a dictionary document to the collection with the next integer document id"""
@@ -98,7 +96,7 @@ class Collection:
             return doc_list
 
     def get_ids(self, cond:dict = None):
-        """Get a list of all document ids in the collection"""
+        """Get a list of all document ids in the collection that meet a criteria, or all ids in general"""
         id_list = []
 
         # If a condition was provided, return document ids matching that condition in a list
@@ -122,7 +120,7 @@ class Collection:
             doc_ids:list[int] = None,
             cond:dict = None
             ):
-        """Update one or more documents based on document ids or a search using a dictionary of new or updated key value pairs"""
+        """Update one or more documents based on document ids or a search using a dictionary of new or updated key value pairs. Return the number of documents updated, 0 if an error occurs"""
         update_count = 0
 
         # If an ID is given, check if it exists then update if it does
@@ -181,11 +179,12 @@ class Collection:
         self.storage.write(self.docs, self.file_path)
         return 1
 
+
 if __name__ == "__main__":
     test_coll = Collection('./test_coll.json')
 
     test_one = test_coll.get_docs(doc_id=1)
-    test_two = test_coll.get_docs(doc_ids=[1,3,4])
+    test_two = test_coll.get_docs(doc_ids=[5,3,4])
     test_three = test_coll.get_docs(cond={'two':2})
     test_four = test_coll.get_docs()
     print("one")
